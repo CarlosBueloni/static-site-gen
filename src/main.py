@@ -1,8 +1,12 @@
 from textnode import TextNode
+from htmlnode import HTMLNode
 
 def main():
-    node = TextNode("this is text", "bold", "www.google.com")
+    node = HTMLNode("p", "text", None, {
+        "href": "https://www.google.com", 
+        "target": "_blank",
+        })
+    print(f"{node.props_to_html()}")
     print(node)
-    print(node == TextNode("this is text", "bold", "www.google.com"))
 
 main()
