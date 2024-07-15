@@ -1,6 +1,6 @@
 import unittest
 
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 
 class TestHTMLNode(unittest.TestCase):
     def test_values_default(self):
@@ -27,6 +27,54 @@ class TestHTMLNode(unittest.TestCase):
     def test_to_html_leaf_no_tag(self):
         l_node =LeafNode(None, "this is a raw text")
         self.assertEqual(l_node.to_html(), "this is a raw text")
+
+    def test_to_html_parent_no_tag(self):
+        p_node = ParentNode(None, [LeafNode("b", "bold text"), LeafNode(None, "normal text")],)
+        with self.assertRaises(ValueError, msg="All parent nodes must have a tag"):
+            p_node.to_html()
+
+    def test_to_html_parent_no_children(self):
+        p_node = ParentNode("a", None)
+        with self.assertRaises(ValueError, msg="All parent nodes must have children"):
+            p_node.to_html()
+
+    def test_to_html_parent(self):
+        p_node = ParentNode(
+                "p",
+                [
+                    LeafNode("b", "Bold text"),
+                    LeafNode(None, "Normal text"),
+                    LeafNode("i", "italic text"),
+                    LeafNode(None, "Normal text"),
+                ],
+                )
+        self.assertEqual(p_node.to_html(), "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>")
+
+    def test_to_html_parent_2(self):
+        p_node = ParentNode(
+                "p",
+                [
+                    LeafNode(None, "text"),
+                    ParentNode(
+                    "div",
+                    [LeafNode(None, "text inside div")]
+                    )
+                ]
+                )
+        self.assertEqual(p_node.to_html(), "<p>text<div>text inside div</div></p>")
+
+    def test_to_html_parent_with_props(self):
+        p_node = ParentNode(
+                "p",
+                [
+                    LeafNode("b", "Bold text"),
+                    LeafNode(None, "Normal text"),
+                    LeafNode("i", "italic text"),
+                    LeafNode(None, "Normal text"),
+                ],
+                {"href": "https://www.google.com"}
+                )
+        self.assertEqual(p_node.to_html(), '<p href="https://www.google.com"><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>')
 
     def test_props_to_html(self):
         h_node = HTMLNode("p", "text", None, {
