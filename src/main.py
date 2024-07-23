@@ -1,34 +1,18 @@
+from helper import (
+    extract_markdown_images, 
+    extract_markdown_links, 
+    split_nodes_links,
+    split_nodes_images
+)
 from textnode import TextNode, TextType
-from htmlnode import HTMLNode, LeafNode, ParentNode
-from helper import text_node_to_html_node
-
 def main():
-    t_node = TextNode("this is a bold text", TextType.text_type_bold.value)
-    t_node2 = TextNode("this is a link text", TextType.text_type_link.value, "https://google.com")
-    l_node = LeafNode("a", "Click me!", {"href": "https://www.google.com"})
-    l_node2 = LeafNode("p", "This is a paragraph of text.")
-    print(t_node2)
-    print(text_node_to_html_node(t_node2).to_html())
-    print(l_node2.to_html())
-    print(l_node.to_html())
-    node = ParentNode(
-        "p",
-        [
-            LeafNode("b", "Bold text"),
-            LeafNode(None, "Normal text"),
-            LeafNode("i", "italic text"),
-            ParentNode(
-            "p",
-            [
-                LeafNode("b", "Bold text inside"),
-                LeafNode(None, "Normal text inside"),
-                LeafNode("i", "italic text inside"),
-                LeafNode(None, "Normal text inside"),
-            ]
-            ),
-            LeafNode(None, "Normal text"),
-        ]
-    )
-    print(node.to_html())
-    print(TextType.text_type_bold.value)
+    text = "[link](https://google.com) This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+    img_text = "a dog ![dog image](/imgs/dog.png) and a cat ![cat image](/images/cat.png)"
+    node =  TextNode(
+        text,
+        TextType.link.value,)
+    img_node = TextNode(
+            img_text,
+            TextType.image.value)
+    print(split_nodes_images([img_node]))
 main()
