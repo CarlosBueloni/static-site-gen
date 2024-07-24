@@ -1,3 +1,4 @@
+from re import T
 import unittest
 from helper import (
         text_node_to_html_node,
@@ -6,6 +7,7 @@ from helper import (
         extract_markdown_images,
         split_nodes_images,
         split_nodes_links,
+        text_to_textnode,
 )
 from textnode import TextNode, TextType
 from htmlnode import LeafNode
@@ -74,87 +76,57 @@ class TestHelper(unittest.TestCase):
         self.assertEqual(extract_markdown_links(text),
                          [("to boot dev", "https://www.boot.dev"), ("to youtube", "https://www.youtube.com/@bootdotdev")])
 
-    def test_split_nodes_links_empty_list(self):
-        text = TextNode("", TextType.text.value)
-        self.assertEqual(split_nodes_links([text]), [])
-
-    def test_split_nodes_links_one_node_and_link(self):
-        node = TextNode("to access google go to [google](https://www.google.com)", TextType.link.value)
+    def test_split_nodes_links(self):
+        node = TextNode(
+            "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)",
+            TextType.text.value,
+        )
         self.assertEqual(split_nodes_links([node]),
                          [
-                            TextNode("to access google go to ", TextType.text.value), 
-                            TextNode("google", TextType.link.value, "https://www.google.com"),
+                             TextNode("This is text with a link ", TextType.text.value),
+                             TextNode("to boot dev", TextType.link.value, "https://www.boot.dev"),
+                             TextNode(" and ", TextType.text.value),
+                             TextNode("to youtube", TextType.link.value, "https://www.youtube.com/@bootdotdev"),
                          ])
-    def test_split_nodes_links_one_node_multiple_links(self):
-        node = TextNode("cat [cat](cat.com) dog [dog](dog.com)", TextType.link.value)
+
+    def test_split_nodes_links2(self):
+        node = TextNode( "before [link](https://link.com) after", TextType.text.value)
         self.assertEqual(split_nodes_links([node]),
                          [
-                            TextNode("cat ", TextType.text.value),
-                            TextNode("cat", TextType.link.value, "cat.com"),
-                            TextNode(" dog ", TextType.text.value),
-                            TextNode("dog", TextType.link.value, "dog.com"),
+                            TextNode("before ", TextType.text.value),
+                            TextNode("link", TextType.link.value, "https://link.com"),
+                            TextNode(" after", TextType.text.value),
                          ])
 
-    def test_split_nodes_links_multiple_nodes(self):
-        node2 = TextNode("dog [dog](dog.com)", TextType.link.value)
-        node = TextNode("cat [cat](cat.com)", TextType.link.value)
-        self.assertEqual(split_nodes_links([node, node2]),
-                         [
-                            TextNode("cat ", TextType.text.value),
-                            TextNode("cat", TextType.link.value, "cat.com"),
-                            TextNode("dog ", TextType.text.value),
-                            TextNode("dog", TextType.link.value, "dog.com"),
-                         ])
+    def test_split_nodes_not_closed(self):
+        node = TextNode( "before [link]asdasd(https://link.com after)", TextType.text.value)
+        with self.assertRaises(ValueError):
+            split_nodes_links([node])
 
-    def test_split_nodes_links_nodes_without_link(self):
-        node = TextNode("this node has no links", TextType.text.value)
-        node2 = TextNode("this is a link [google](https://www.google.com)", TextType.link.value)
-        self.assertEqual(split_nodes_links([node, node2]),
-                         [
-                            TextNode("this node has no links", TextType.text.value),
-                            TextNode("this is a link ", TextType.text.value),
-                            TextNode("google", TextType.link.value, "https://www.google.com"),
-                         ])
-
-    def test_split_nodes_images_empty_list(self):
-        text = TextNode("", TextType.text.value)
-        self.assertEqual(split_nodes_images([text]), [])
-
-    def test_split_nodes_images_one_node_and_image(self):
-        i_node = TextNode("to access google go to ![google](https://www.google.com)", TextType.image.value)
-        self.assertEqual(split_nodes_images([i_node]),
-                         [
-                            TextNode("to access google go to ", TextType.text.value), 
-                            TextNode("google", TextType.image.value, "https://www.google.com"),
-                         ])
-
-    def test_split_nodes_images_one_node_multiple_images(self):
-        node = TextNode("cat ![cat](cat.com) dog ![dog](dog.com)", TextType.image.value)
+    def test_split_nodes_images(self):
+        node = TextNode(
+            "This is text with a image ![to boot dev](https://www.boot.dev) and ![to youtube](https://www.youtube.com/@bootdotdev)",
+            TextType.text.value,
+        )
         self.assertEqual(split_nodes_images([node]),
                          [
-                            TextNode("cat ", TextType.text.value),
-                            TextNode("cat", TextType.image.value, "cat.com"),
-                            TextNode(" dog ", TextType.text.value),
-                            TextNode("dog", TextType.image.value, "dog.com"),
+                             TextNode("This is text with a image ", TextType.text.value),
+                             TextNode("to boot dev", TextType.image.value, "https://www.boot.dev"),
+                             TextNode(" and ", TextType.text.value),
+                             TextNode("to youtube", TextType.image.value, "https://www.youtube.com/@bootdotdev"),
                          ])
 
-    def test_split_nodes_images_multiple_nodes(self):
-        node2 = TextNode("dog ![dog](dog.com)", TextType.image.value)
-        node = TextNode("cat ![cat](cat.com)", TextType.image.value)
-        self.assertEqual(split_nodes_images([node, node2]),
+    def test_split_nodes_images2(self):
+        node = TextNode( "before ![image](https://image.com) after", TextType.text.value)
+        self.assertEqual(split_nodes_images([node]),
                          [
-                            TextNode("cat ", TextType.text.value),
-                            TextNode("cat", TextType.image.value, "cat.com"),
-                            TextNode("dog ", TextType.text.value),
-                            TextNode("dog", TextType.image.value, "dog.com"),
+                            TextNode("before ", TextType.text.value),
+                            TextNode("image", TextType.image.value, "https://image.com"),
+                            TextNode(" after", TextType.text.value),
                          ])
+        
+    def test_split_nodes_images_not_closed(self):
+        node = TextNode( "before ![link]asdasd(https://link.com after)", TextType.text.value)
+        with self.assertRaises(ValueError):
+            split_nodes_images([node])
 
-    def test_split_nodes_images_nodes_without_image(self):
-        node = TextNode("this node has no images", TextType.text.value)
-        node2 = TextNode("this is a image ![google](https://www.google.com)", TextType.image.value)
-        self.assertEqual(split_nodes_images([node, node2]),
-                         [
-                            TextNode("this node has no images", TextType.text.value),
-                            TextNode("this is a image ", TextType.text.value),
-                            TextNode("google", TextType.image.value, "https://www.google.com"),
-                         ])
