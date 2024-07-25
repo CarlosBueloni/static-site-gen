@@ -124,9 +124,85 @@ class TestHelper(unittest.TestCase):
                             TextNode("image", TextType.image.value, "https://image.com"),
                             TextNode(" after", TextType.text.value),
                          ])
-        
+
     def test_split_nodes_images_not_closed(self):
         node = TextNode( "before ![link]asdasd(https://link.com after)", TextType.text.value)
         with self.assertRaises(ValueError):
             split_nodes_images([node])
+
+    def test_text_to_textnode(self):
+        text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)"
+        self.assertEqual(text_to_textnode(text),
+                         [
+                             TextNode("This is ", TextType.text.value),
+                             TextNode("text", TextType.bold.value), 
+                             TextNode(" with an ", TextType.text.value),
+                             TextNode("italic", TextType.italic.value),
+                             TextNode(" word and a ", TextType.text.value),
+                             TextNode("code block", TextType.code.value),
+                             TextNode(" and an ", TextType.text.value),
+                             TextNode("obi wan image", TextType.image.value, "https://i.imgur.com/fJRm4Vk.jpeg"),
+                             TextNode(" and a ", TextType.text.value),
+                             TextNode("link", TextType.link.value, "https://boot.dev"),
+                         ])
+
+    def test_text_to_textnode_only_text(self):
+        text = "this is text"
+        self.assertEqual(text_to_textnode(text),[TextNode("this is text", TextType.text.value)])
+
+    def test_text_to_textnode_only_bold(self):
+        text = "**bold**"
+        self.assertEqual(text_to_textnode(text),[TextNode("bold", TextType.bold.value)])
+
+    def test_text_to_textnode_only_italic(self):
+        text = "*italic*"
+        self.assertEqual(text_to_textnode(text),[TextNode("italic", TextType.italic.value)])
+
+    def test_text_to_textnode_only_code(self):
+        text = "`code`"
+        self.assertEqual(text_to_textnode(text),[TextNode("code", TextType.code.value)])
+
+    def test_text_to_textnode_only_image(self):
+        text = "![cute dog](/imgs/dog.png)"
+        self.assertEqual(text_to_textnode(text),[TextNode("cute dog", TextType.image.value, "/imgs/dog.png")])
+
+    def test_text_to_textnode_only_link(self):
+        text = "[cute dog](www.images.com/imgs/dog.png)"
+        self.assertEqual(text_to_textnode(text),[TextNode("cute dog", TextType.link.value, "www.images.com/imgs/dog.png")])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

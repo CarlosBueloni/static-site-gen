@@ -57,7 +57,7 @@ def split_nodes_links(old_nodes):
             text = sections[1]
         if text != "":
             new_nodes.append(TextNode(text, TextType.text.value))
-        return new_nodes
+    return new_nodes
 
 def split_nodes_images(old_nodes):
     new_nodes = []
@@ -80,7 +80,7 @@ def split_nodes_images(old_nodes):
             text = sections[1]
         if text != "":
             new_nodes.append(TextNode(text, TextType.text.value))
-        return new_nodes
+    return new_nodes
 
 def extract_markdown_images(text):
     texts = re.findall(r"!\[(.*?)\]", text)
@@ -92,3 +92,11 @@ def extract_markdown_links(text):
     urls = re.findall(r"\((.*?)\)", text)
     return list(zip(texts, urls))
 
+def text_to_textnode(text):
+    text_node = TextNode(text, TextType.text.value)
+    bold_nodes = split_nodes_delimiter([text_node], "**", TextType.bold.value)
+    italic_nodes = split_nodes_delimiter(bold_nodes, "*", TextType.italic.value)
+    code_nodes = split_nodes_delimiter(italic_nodes, "`", TextType.code.value)
+    image_nodes = split_nodes_images(code_nodes)
+    link_nodes = split_nodes_links(image_nodes)
+    return link_nodes
