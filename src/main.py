@@ -1,4 +1,4 @@
-from block_markdown import markdown_to_blocks
+from block_markdown import block_to_block_type, markdown_to_blocks
 from inline_markdown import (
     extract_markdown_images, 
     extract_markdown_links, 
@@ -9,16 +9,8 @@ from inline_markdown import (
 from textnode import TextNode, TextType
 
 def main():
-    text =  """
-    # This is a heading
-
-    This is a paragraph of text. It has some **bold** and *italic* words inside of it.
-
-    * This is the first list item in a list block
-    * This is a list item
-    * This is another list item
-    """
-    print(markdown_to_blocks(text))
+    text = ">new\n>job"
+    print(block_to_block_type(text))     
 
 
 main()
