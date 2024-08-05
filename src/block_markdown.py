@@ -43,8 +43,8 @@ def block_to_html_node(block):
         text = text_to_children(text)
         return ParentNode(f"h{heading.count("#")}", text)
     if block_type == "code":
-        text = text_to_children(block.strip("```"))
-        return ParentNode("pre", ParentNode("code", text))
+        text = text_to_children(block.strip("```").lstrip("\n"))
+        return ParentNode("pre", [ParentNode("code", text)])
     if block_type == "quote":
         lines = block.splitlines()
         new_lines = []

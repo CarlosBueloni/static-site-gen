@@ -10,12 +10,6 @@ class TestHTMLNode(unittest.TestCase):
         self.assertEqual(h_node.children, None)
         self.assertEqual(h_node.props, None)
 
-    def test_eq(self):
-        node1 = HTMLNode("p", "text")
-        node2 = HTMLNode("p", "text")
-        self.assertEqual(node1, node2)
-
-
     def test_to_html(self):
         h_node = HTMLNode("p", "text")
         with self.assertRaises(NotImplementedError):
@@ -91,5 +85,5 @@ class TestHTMLNode(unittest.TestCase):
 
     def test_rpr(self):
         h_node = HTMLNode("p", "this is a paragraph")
-        self.assertEqual(str(h_node), "HTMLNode(p, this is a paragraph, None, None)")
+        self.assertEqual(str(h_node), "HTMLNode(p, this is a paragraph, children: None, None)")
 

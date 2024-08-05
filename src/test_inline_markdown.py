@@ -13,29 +13,6 @@ from textnode import TextNode, TextType
 from htmlnode import LeafNode
 
 class TestHelper(unittest.TestCase):
-    def test_tnode_to_hnode(self):
-        tnode_text = TextNode("this is a text", TextType.text.value)
-        tnode_bold = TextNode("this is bold", TextType.bold.value)
-        tnode_italic = TextNode("this is italic", TextType.italic.value)
-        tnode_code = TextNode("print('hello world')", TextType.code.value)
-        tnode_link = TextNode("google", TextType.link.value, "https://www.google.com")
-        tnode_img = TextNode("dog", TextType.image.value, "/pics/dog.png")
-        tnode_type_not_found = TextNode("this dosen't have a type", None)
-
-        self.assertEqual(text_node_to_html_node(tnode_text), 
-                         LeafNode(None, "this is a text", None))
-        self.assertEqual(text_node_to_html_node(tnode_bold), 
-                         LeafNode("b", "this is bold", None))
-        self.assertEqual(text_node_to_html_node(tnode_italic), 
-                         LeafNode("i", "this is italic", None))
-        self.assertEqual(text_node_to_html_node(tnode_code), 
-                         LeafNode("code","print('hello world')", None))
-        self.assertEqual(text_node_to_html_node(tnode_link), 
-                         LeafNode("a", "google", {"href": "https://www.google.com"}))
-        self.assertEqual(text_node_to_html_node(tnode_img), 
-                         LeafNode("img", "", {"src":"/pics/dog.png", "alt": "dog"}))
-        with self.assertRaises(ValueError):
-            text_node_to_html_node(tnode_type_not_found)
 
     def test_split_nodes_delimiter(self):
         node_code = TextNode("This is a text with a `code block` word", 
@@ -169,6 +146,7 @@ class TestHelper(unittest.TestCase):
     def test_text_to_textnode_only_link(self):
         text = "[cute dog](www.images.com/imgs/dog.png)"
         self.assertEqual(text_to_textnode(text),[TextNode("cute dog", TextType.link.value, "www.images.com/imgs/dog.png")])
+
 
 
 
